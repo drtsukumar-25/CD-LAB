@@ -1,0 +1,12 @@
+install
+xcode-select --install
+brew install flex bison
+
+bison -d parser-adv.y
+flex lexer-analysis.l
+
+Compile
+gcc parser-adv.tab.c lex.yy.c -o parser
+
+Run
+./parser
