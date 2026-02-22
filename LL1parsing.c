@@ -1,104 +1,87 @@
-#include<stdio.h>
-#include<string.h>
+#include <stdio.h>
+#include <string.h>
 
-char stack[100], input[100];
-int top=-1, i=0;
+char stack[50], input[50];
+int top = -1, i = 0, step = 1;
 
-void push(char c){ stack[++top]=c; }
+void push(char c){ stack[++top] = c; }
 char pop(){ return stack[top--]; }
 
+void printStack(){
+    for(int j=0;j<=top;j++)
+        printf("%c",stack[j]);
+}
+
 int main(){
-    printf("Enter input: ");
-    scanf("%s", input);
-    strcat(input,"$");
+
+    printf("Enter string (end with $): ");
+    scanf("%s",input);
 
     push('$');
     push('E');
 
+    printf("\nStep\tStack\tInput\tAction\n");
+    printf("---------------------------------------------\n");
+
     while(top>=0){
+
         char X = stack[top];
         char a = input[i];
 
-        /* Accept condition */
-        if(X=='$' && a=='$'){
-            printf("Accepted\n");
-            return 0;
-        }
+        printf("%d\t",step++);
+        printStack();
+        printf("\t%s\t",input+i);
 
-        /* Terminal match for single char */
         if(X==a){
-            pop();
-            i++;
+            pop(); i++;
+            printf("match %c\n",a);
         }
 
-        /* Match id (two characters) */
-        else if(X=='F' && input[i]=='i' && input[i+1]=='d'){
-            pop();
-            i+=2;
+        else if(X=='E' && a=='i'){
+            pop(); push('e'); push('T');
+            printf("E->TE'\n");
         }
 
-        /* E → T E'  (E' represented as A) */
-        else if(X=='E'){
-            pop();
-            push('A');
-            push('T');
+        else if(X=='e' && a=='+'){
+            pop(); push('e'); push('T'); push('+');
+            printf("E'->+TE'\n");
         }
 
-        /* E' → + T E' | ε */
-        else if(X=='A'){
+        else if(X=='e' && (a=='$')){
             pop();
-            if(a=='+'){
-                push('A');
-                push('T');
-                push('+');
-            }
-            else if(a==')' || a=='$'){
-                /* epsilon */
-            }
-            else{
-                printf("Rejected\n");
-                return 0;
-            }
+            printf("E'->ε\n");
         }
 
-        /* T → F T'  (T' represented as B) */
-        else if(X=='T'){
-            pop();
-            push('B');
-            push('F');
+        else if(X=='T' && a=='i'){
+            pop(); push('t'); push('F');
+            printf("T->FT'\n");
         }
 
-        /* T' → * F T' | ε */
-        else if(X=='B'){
-            pop();
-            if(a=='*'){
-                push('B');
-                push('F');
-                push('*');
-            }
-            else if(a=='+' || a==')' || a=='$'){
-                /* epsilon */
-            }
-            else{
-                printf("Rejected\n");
-                return 0;
-            }
+        else if(X=='t' && a=='*'){
+            pop(); push('t'); push('F'); push('*');
+            printf("T'->*FT'\n");
         }
 
-        /* F → (E) */
-        else if(X=='F' && a=='('){
+        else if(X=='t' && (a=='+'||a=='$')){
             pop();
-            push(')');
-            push('E');
-            push('(');
+            printf("T'->ε\n");
+        }
+
+        else if(X=='F' && a=='i'){
+            pop(); push('i');
+            printf("F->i\n");
         }
 
         else{
-            printf("Rejected\n");
+            printf("Error\n");
             return 0;
         }
     }
 
-    printf("Rejected\n");
+    if(input[i]=='\0')
+        printf("\n$ accepted\n");
+    else
+        printf("\nRejected\n");
+
     return 0;
 }
